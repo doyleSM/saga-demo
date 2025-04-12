@@ -1,0 +1,29 @@
+### Requisição GET para obter todos os pedidos
+GET http://localhost:3000/orders
+Content-Type: application/json
+
+### Cria um novo pedido
+POST http://localhost:3000/orders
+Content-Type: application/json
+
+{
+  "customerName": "João Silva"
+}
+
+### Adiciona um item ao pedido com ID 1234567890abcdef12345678
+POST http://localhost:3000/orders/1234567890abcdef12345678/items
+Content-Type: application/json
+
+{
+  "product": "Notebook Dell",
+  "quantity": 2,
+  "price": 3500
+}
+
+### Recupera os detalhes de um pedido específico
+GET http://localhost:3000/orders/67fa485b3a7d79a4149bfec2
+Content-Type: application/json
+
+### Recupera os detalhes de um pedido específico
+GET http://localhost:3000/orders
+Content-Type: application/json

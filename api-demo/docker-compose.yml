@@ -1,0 +1,14 @@
+services:
+  mongo:
+    image: mongo:8
+    container_name: mongo8
+    ports:
+      - '27017:27017' # Mapeia a porta 27017 do container para a mesma porta no host
+    volumes:
+      - mongo_data:/data/db # Referência ao volume nomeado "mongo_data"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root # Usuário root para inicialização (opcional)
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword # Senha do root (opcional)
+
+volumes:
+  mongo_data: # Declaração do volume nomeado
