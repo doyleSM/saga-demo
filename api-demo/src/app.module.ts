@@ -6,6 +6,7 @@ import { OrdersController } from './orders/orders.controller';
 import { OrderItemsController } from './order-itens/order-itens.controller';
 import { OrderItemsService } from './order-itens/order-items.service';
 import { OrdersService } from './orders/orders.service';
+import { CoreOrdersController } from './orders/core-orders.controller';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { OrdersService } from './orders/orders.service';
       { name: OrderItem.name, schema: OrderItemSchema },
     ]),
   ],
-  controllers: [OrdersController, OrderItemsController],
+  controllers: [OrdersController, OrderItemsController, CoreOrdersController],
   providers: [OrderItemsService, OrdersService],
 })
 export class AppModule {}

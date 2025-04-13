@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Version,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -37,6 +38,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
+  @Version('1')
   @ApiCreatedResponse({ type: Order, description: 'Pedido criado com sucesso' })
   @ApiBadRequestResponse({
     description: 'Dados inválidos para criação de pedido',
@@ -46,6 +48,7 @@ export class OrdersController {
   }
 
   @Get()
+  @Version('1')
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
   @ApiOkResponse({
@@ -60,6 +63,7 @@ export class OrdersController {
   }
 
   @Get(':orderId')
+  @Version('1')
   @ApiParam({ name: 'orderId', description: 'ID do pedido', type: String })
   @ApiOkResponse({ type: Order, description: 'Detalhes de um pedido' })
   @ApiBadRequestResponse({ description: 'orderId inválido' })
@@ -83,6 +87,7 @@ export class OrdersController {
   }
 
   @Patch(':orderId/status')
+  @Version('1')
   @ApiParam({ name: 'orderId', description: 'ID do pedido', type: String })
   @ApiBody({ type: UpdateOrderStatusDto })
   @ApiOkResponse({

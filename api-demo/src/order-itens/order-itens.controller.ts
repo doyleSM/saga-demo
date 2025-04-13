@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Version,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -36,6 +37,7 @@ export class OrderItemsController {
   constructor(private readonly itemsService: OrderItemsService) {}
 
   @Post()
+  @Version('1')
   @ApiHeader({
     name: 'Idempotency-Key',
     description: 'Chave única (UUID) para garantir idempotência',
@@ -58,6 +60,7 @@ export class OrderItemsController {
   }
 
   @Get()
+  @Version('1')
   @ApiParam({ name: 'orderId', description: 'ID do pedido', type: String })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
@@ -76,6 +79,7 @@ export class OrderItemsController {
   }
 
   @Get(':itemId')
+  @Version('1')
   @ApiParam({ name: 'orderId', description: 'ID do pedido', type: String })
   @ApiParam({ name: 'itemId', description: 'ID do item', type: String })
   @ApiOkResponse({
@@ -92,6 +96,7 @@ export class OrderItemsController {
   }
 
   @Delete(':itemId')
+  @Version('1')
   @ApiParam({ name: 'orderId', description: 'ID do pedido', type: String })
   @ApiParam({
     name: 'itemId',
@@ -110,6 +115,7 @@ export class OrderItemsController {
   }
 
   @Delete()
+  @Version('1')
   @ApiParam({ name: 'orderId', description: 'ID do pedido', type: String })
   @ApiNoContentResponse({ description: 'Todos os itens removidos com sucesso' })
   @ApiBadRequestResponse({ description: 'orderId inválido' })

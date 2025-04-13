@@ -107,4 +107,22 @@ export class OrdersService {
     const saved = await order.save();
     return saved.toObject();
   }
+
+  async getAllCoreOrders(pagination: PaginationQueryDto): Promise<Order[]> {
+    const page = pagination.page ?? 1;
+    const limit = pagination.limit ?? 20;
+    const skip = (page - 1) * limit;
+    return this.orderModel
+      .find()
+      .populate('items')
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
+  }
+
+  async getOrderByIdCore(orderId: string): Promise<Order | null> {
+    const oid = new Types.ObjectId(orderId);
+    return this.orderModel.findById(oid).populate('items').lean().exec();
+  }
 }
