@@ -19,9 +19,9 @@ export class CreateOrderItemsStep
     this.logger.log(`Creating ${ctx.items.length} items for order ${ctx.orderId}`);
     for (const item of ctx.items) {
       this.logger.log(`→ Creating item ${item.product} x${item.quantity}`);
-      if (item.product === 'Product 5') {
-        throw new Error('Erro ao criar item "Product 5"');
-      }
+      // if (item.product === 'Product 5') {
+      //   throw new Error('Erro ao criar item "Product 5"');
+      // }
       const key = generateIdempotencyKey({ orderId: ctx.orderId, item });
       const resp: AxiosResponse<OrderItemResponse> = await firstValueFrom(
         this.http.post<OrderItemResponse>(

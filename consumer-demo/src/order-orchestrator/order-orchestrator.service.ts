@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { SagaOrchestrator } from './saga/orchestrator';
-import { CreateOrderItemsStep } from './saga/create-items.step';
+import { CreateOrderItemsStep } from './saga/create-order-items.step';
 import { UpdateOrderStatusStep } from './saga/update-status.step';
 import { CreateOrderItemType } from './types/create-order.type';
 import { OrderOrchestratorContext } from './types/order-oschestrator-ctx';

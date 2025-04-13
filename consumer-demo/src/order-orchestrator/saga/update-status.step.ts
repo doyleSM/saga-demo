@@ -18,6 +18,7 @@ export class UpdateOrderStatusStep
       orderId: ctx.orderId,
       newStatus: ctx.newStatus,
     });
+
     await firstValueFrom(
       this.http.patch(
         `http://localhost:3000/orders/${ctx.orderId}/status`,
