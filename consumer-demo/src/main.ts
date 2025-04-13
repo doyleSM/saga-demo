@@ -9,7 +9,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Simulator API')
-    .setDescription('Simula criação de order items em lote')
+    .setDescription('Simula criação de order items')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
