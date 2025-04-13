@@ -1,11 +1,13 @@
 import { Controller, Post, Param } from '@nestjs/common';
 import { ApiTags, ApiParam, ApiBadRequestResponse } from '@nestjs/swagger';
-import { SimulatorService } from './simulator.service';
+import { OrderOrchestratorService } from './order-orchestrator.service';
 
-@ApiTags('simulate')
-@Controller('simulate')
-export class SimulatorController {
-  constructor(private readonly simulatorService: SimulatorService) {}
+@ApiTags('order-orchestrator')
+@Controller('order-orchestrator')
+export class OrderOrchestratorController {
+  constructor(
+    private readonly orderOrchestratorService: OrderOrchestratorService,
+  ) {}
 
   @Post(':orderId')
   @ApiParam({
@@ -17,6 +19,6 @@ export class SimulatorController {
     description: 'orderId inválido ou erro ao chamar a API de orders',
   })
   simulate(@Param('orderId') orderId: string): void {
-    void this.simulatorService.simulate(orderId);
+    void this.orderOrchestratorService.execute(orderId);
   }
 }

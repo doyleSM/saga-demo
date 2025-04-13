@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
-import { SimulatorModule } from './simulator/simulator.module';
+import { OrderOrchestratorModule } from './order-orchestrator/order-orchestrator.module';
 
 @Module({
-  imports: [HttpModule, SimulatorModule],
+  imports: [HttpModule, OrderOrchestratorModule],
   controllers: [],
   providers: [],
 })
