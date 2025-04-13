@@ -1,32 +1,33 @@
 import {
   Controller,
   Get,
-  Post,
   Delete,
   Body,
   Param,
   Query,
   HttpCode,
   HttpStatus,
+  Post,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiParam,
   ApiQuery,
-  ApiCreatedResponse,
   ApiOkResponse,
   ApiNoContentResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiExtraModels,
   getSchemaPath,
+  ApiHeader,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { OrderItemsService } from './order-items.service';
-import { BatchCreateOrderItemDto } from './dto/batch-create-order-item.dto';
-
 import { OrderItemsResponseDto } from './dto/order-items-response.dto';
 import { OrderItem } from 'src/shared/schemas/order-item.schema';
 import { PaginationQueryDto } from 'src/shared/dto/pagination-query.dto';
+import { CreateOrderItemDto } from './dto/create-order-item.dto';
+import { IdempotencyKey } from 'src/shared/decorator/idempotency.decorator';
 
 @ApiTags('order-items')
 @ApiExtraModels(OrderItem, OrderItemsResponseDto)
@@ -35,20 +36,25 @@ export class OrderItemsController {
   constructor(private readonly itemsService: OrderItemsService) {}
 
   @Post()
+  @ApiHeader({
+    name: 'Idempotency-Key',
+    description: 'Chave única (UUID) para garantir idempotência',
+    required: true,
+    schema: { type: 'string', format: 'uuid' },
+  })
   @ApiParam({ name: 'orderId', description: 'ID do pedido', type: String })
   @ApiCreatedResponse({
-    type: [OrderItem],
-    description: 'Itens adicionados com sucesso',
+    type: OrderItem,
+    description: 'Item criado ou já existente retornado',
   })
-  @ApiBadRequestResponse({
-    description: 'Dados inválidos para criação de item',
-  })
+  @ApiBadRequestResponse({ description: 'Dados inválidos' })
   @ApiNotFoundResponse({ description: 'Pedido não encontrado' })
-  async addItems(
+  async addItem(
     @Param('orderId') orderId: string,
-    @Body() batchDto: BatchCreateOrderItemDto,
-  ): Promise<OrderItem[]> {
-    return this.itemsService.addOrderItems(orderId, batchDto.items);
+    @Body() dto: CreateOrderItemDto,
+    @IdempotencyKey() idempotencyKey: string,
+  ): Promise<OrderItem> {
+    return this.itemsService.addOrderItem(orderId, dto, idempotencyKey);
   }
 
   @Get()
@@ -57,6 +63,7 @@ export class OrderItemsController {
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
   @ApiOkResponse({
     description: 'Lista paginada de itens do pedido',
+
     schema: { $ref: getSchemaPath(OrderItemsResponseDto) },
   })
   @ApiBadRequestResponse({ description: 'Parâmetros de paginação inválidos' })

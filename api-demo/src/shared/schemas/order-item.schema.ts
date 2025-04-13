@@ -16,6 +16,9 @@ export class OrderItem {
 
   @Prop({ type: Types.ObjectId, ref: 'Order', required: true })
   order: Types.ObjectId;
+
+  @Prop({ unique: true, sparse: true })
+  idempotencyKey?: string;
 }
 
 export const OrderItemSchema = SchemaFactory.createForClass(OrderItem);

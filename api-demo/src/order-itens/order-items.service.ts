@@ -21,10 +21,11 @@ export class OrderItemsService {
     private orderItemModel: Model<OrderItemDocument>,
   ) {}
 
-  async addOrderItems(
+  async addOrderItem(
     orderId: string,
-    itemsDto: CreateOrderItemDto[],
-  ): Promise<OrderItem[]> {
+    dto: CreateOrderItemDto,
+    idempotencyKey: string,
+  ): Promise<OrderItem> {
     let oid: Types.ObjectId;
     try {
       oid = new Types.ObjectId(orderId);
@@ -37,14 +38,25 @@ export class OrderItemsService {
       throw new NotFoundException('Order não encontrado');
     }
 
-    const docs = itemsDto.map((dto) => ({ ...dto, order: oid }));
-    const createdItems = await this.orderItemModel.insertMany(docs);
+    const existing = await this.orderItemModel.findOne({
+      idempotencyKey,
+    });
+    if (existing) {
+      return existing.toObject();
+    }
 
-    const itemIds = createdItems.map((i) => i._id as Types.ObjectId);
-    order.items.push(...itemIds);
+    const created = await this.orderItemModel.create({
+      product: dto.product,
+      quantity: dto.quantity,
+      price: dto.price,
+      order: oid,
+      idempotencyKey,
+    });
+
+    order.items.push(created._id as Types.ObjectId);
     await order.save();
 
-    return createdItems.map((i) => i.toObject());
+    return created.toObject();
   }
 
   async getOrderItems(
