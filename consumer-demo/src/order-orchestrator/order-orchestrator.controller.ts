@@ -1,4 +1,4 @@
-import { Controller, Post, Param } from '@nestjs/common';
+import { Controller, Post, Param, Version } from '@nestjs/common';
 import { ApiTags, ApiParam, ApiBadRequestResponse } from '@nestjs/swagger';
 import { OrderOrchestratorService } from './order-orchestrator.service';
 
@@ -10,6 +10,7 @@ export class OrderOrchestratorController {
   ) {}
 
   @Post(':orderId')
+  @Version('1')
   @ApiParam({
     name: 'orderId',
     description: 'ID do pedido para o qual queremos gerar/atualizar items',
