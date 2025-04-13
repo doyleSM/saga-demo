@@ -8,7 +8,6 @@ export class Order {
   @Prop({ required: true })
   customerName: string;
 
-  // Armazena referências aos itens do pedido
   @Prop({ type: [{ type: Types.ObjectId, ref: 'OrderItem' }], default: [] })
   items: Types.ObjectId[];
 

@@ -1,9 +1,18 @@
-// src/orders/orders.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Order, OrderDocument } from './schemas/order.schema';
-import { OrderItem, OrderItemDocument } from './schemas/order-item.schema';
+import { Model, Types } from 'mongoose';
+import {
+  OrderItem,
+  OrderItemDocument,
+} from 'src/shared/schemas/order-item.schema';
+import { Order, OrderDocument } from 'src/shared/schemas/order.schema';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { PaginationQueryDto } from 'src/shared/dto/pagination-query.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Injectable()
 export class OrdersService {
@@ -13,36 +22,89 @@ export class OrdersService {
     private orderItemModel: Model<OrderItemDocument>,
   ) {}
 
-  // Cria um novo pedido
-  async createOrder(createOrderDto: any): Promise<Order> {
-    const createdOrder = new this.orderModel(createOrderDto);
-    return createdOrder.save();
+  async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+    const created = new this.orderModel(createOrderDto);
+    return created.save();
   }
 
-  // Adiciona um item a um pedido existente
-  async addOrderItem(
-    orderId: string,
-    createOrderItemDto: any,
-  ): Promise<OrderItem> {
-    const order = await this.orderModel.findById(orderId);
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-    const orderItem = new this.orderItemModel({
-      ...createOrderItemDto,
-      order: order._id,
-    });
-    const savedOrderItem = await orderItem.save();
+  async getOrders({ page = 1, limit = 20 }: PaginationQueryDto): Promise<{
+    orders: Order[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    const skip = (page - 1) * limit;
+    const [orders, total] = await Promise.all([
+      this.orderModel
+        .find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.orderModel.countDocuments(),
+    ]);
 
-    return savedOrderItem;
+    return {
+      orders,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
-  // Retorna um pedido com seus itens populados
   async getOrderById(orderId: string): Promise<Order> {
-    const order = await this.orderModel.findById(orderId).populate('items');
+    let oid: Types.ObjectId;
+    try {
+      oid = new Types.ObjectId(orderId);
+    } catch {
+      throw new BadRequestException('orderId inválido');
+    }
+
+    const order = await this.orderModel.findById(oid).lean().exec();
     if (!order) {
-      throw new NotFoundException('Order not found');
+      throw new NotFoundException('Order não encontrado');
     }
     return order;
+  }
+
+  async removeOrder(orderId: string): Promise<void> {
+    let oid: Types.ObjectId;
+    try {
+      oid = new Types.ObjectId(orderId);
+    } catch {
+      throw new BadRequestException('orderId inválido');
+    }
+
+    const order = await this.orderModel.findById(oid);
+    if (!order) {
+      throw new NotFoundException('Order não encontrado');
+    }
+
+    await this.orderItemModel.deleteMany({ order: oid }).exec();
+    await this.orderModel.deleteOne({ _id: oid }).exec();
+  }
+
+  async updateOrderStatus(
+    orderId: string,
+    updateDto: UpdateOrderStatusDto,
+  ): Promise<Order> {
+    let oid: Types.ObjectId;
+    try {
+      oid = new Types.ObjectId(orderId);
+    } catch {
+      throw new BadRequestException('orderId inválido');
+    }
+
+    const order = await this.orderModel.findById(oid).exec();
+    if (!order) {
+      throw new NotFoundException('Order não encontrado');
+    }
+
+    order.status = updateDto.status;
+    const saved = await order.save();
+    return saved.toObject();
   }
 }

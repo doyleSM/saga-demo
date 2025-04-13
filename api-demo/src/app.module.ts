@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OrdersModule } from './orders/orders.module';
+import { Order, OrderSchema } from './shared/schemas/order.schema';
+import { OrderItem, OrderItemSchema } from './shared/schemas/order-item.schema';
+import { OrdersController } from './orders/orders.controller';
+import { OrderItemsController } from './order-itens/order-itens.controller';
+import { OrderItemsService } from './order-itens/order-items.service';
+import { OrdersService } from './orders/orders.service';
 
 @Module({
   imports: [
@@ -8,9 +13,12 @@ import { OrdersModule } from './orders/orders.module';
       'mongodb://root:rootpassword@localhost:27017/shop?authSource=admin',
       {},
     ),
-    OrdersModule,
+    MongooseModule.forFeature([
+      { name: Order.name, schema: OrderSchema },
+      { name: OrderItem.name, schema: OrderItemSchema },
+    ]),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [OrdersController, OrderItemsController],
+  providers: [OrderItemsService, OrdersService],
 })
 export class AppModule {}
